@@ -1,0 +1,28 @@
+{
+  "name": "eldritch",
+  "version": "0.0.1",
+  "description": "Watch js files and run them in a hidden Electron browser window when they change.",
+  "main": "main.js",
+  "bin": {
+    "eldritch": "bin/eldritch"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "author": {
+    "name": "DEBRIS APRON",
+    "email": "debrisapron@gmail.com",
+    "url": "http://debrisapron.me"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "chokidar": "^1.5.1",
+    "yargs": "^4.7.1"
+  },
+  "devDependencies": {
+    "async": "^2.0.0-rc.5",
+    "lodash": "^4.13.1",
+    "rimraf": "^2.5.2",
+    "tape": "^4.5.1"
+  }
+}
