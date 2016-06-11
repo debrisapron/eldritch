@@ -1,6 +1,6 @@
 {
   "name": "eldritch",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Watch js files and run them in a hidden Electron browser window when they change.",
   "main": "main.js",
   "bin": {
