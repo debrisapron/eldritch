@@ -3,6 +3,7 @@
 let electron = require('electron')
 let yargs = require('yargs')
 let watcher = require('./watcher')
+let omit = require('lodash.omit')
 
 let remote = electron.remote
 
@@ -23,8 +24,9 @@ let getArgs = () => {
   let remoteArgv = remote.getGlobal('process').argv
   let argv = yargs(remoteArgv).argv
   let paths = argv._.slice(2)
-  return paths
+  let opts = omit(argv, '_', '$0')
+  return [paths, opts]
 }
 
 fixLogging()
-watcher.init(getArgs())
+watcher.init(...getArgs())

@@ -16,10 +16,8 @@ let mkdir = () => fs.mkdtempSync(TMP_FOLDER_PREFIX)
 
 let killChild = (child) => process.kill(-child.pid)
 
-let rmdir = () => rimraf.sync(TMP_FOLDER_PREFIX + '*')
-
-let eldritchSpawn = (args) => {
-  return childProcess.spawn('bin/eldritch', args, { detached: true })
+let eldritchSpawn = (argStr) => {
+  return childProcess.spawn('bin/eldritch', argStr.split(' '), { detached: true })
 }
 
 let getStdout = _.curry((child, cb) => {
@@ -35,10 +33,12 @@ let getStdout = _.curry((child, cb) => {
   child.stdout.on('data', listener)
 })
 
+test.onFinish(() => rimraf.sync(TMP_FOLDER_PREFIX + '*'))
+
 test('add a single file', (t) => {
   let dir = mkdir()
   let fileA = `${ dir }/a.js`
-  let child = eldritchSpawn([fileA])
+  let child = eldritchSpawn(fileA)
   series([
     getStdout(child),
     (cb) => fs.writeFile(fileA, 'console.log("FOO")', cb),
@@ -48,7 +48,6 @@ test('add a single file', (t) => {
     logs = _.compact(_.flatten(logs))
     t.deepEqual(logs, [STARTUP_MSG, CHANGE_MSG, 'FOO'])
     killChild(child)
-    rmdir()
     t.end()
   })
 })
@@ -57,7 +56,7 @@ test('change a single file', (t) => {
   let dir = mkdir()
   let fileA = `${ dir }/a.js`
   fs.writeFileSync(fileA, 'console.log("FOO")')
-  let child = eldritchSpawn([fileA])
+  let child = eldritchSpawn(fileA)
   series([
     getStdout(child),
     (cb) => fs.writeFile(fileA, 'console.log("BAR")', cb),
@@ -67,7 +66,43 @@ test('change a single file', (t) => {
     logs = _.compact(_.flatten(logs))
     t.deepEqual(logs, [STARTUP_MSG, CHANGE_MSG, 'FOO', CHANGE_MSG, 'BAR'])
     killChild(child)
-    rmdir()
+    t.end()
+  })
+})
+
+test('add a file to a folder', (t) => {
+  let dir = mkdir()
+  let folderA = `${ dir }/a`
+  let fileA = `${ folderA }/a.js`
+  fs.mkdirSync(folderA)
+  let child = eldritchSpawn(folderA)
+  series([
+    getStdout(child),
+    (cb) => fs.writeFile(fileA, 'console.log("FOO")', cb),
+    getStdout(child)
+  ], (err, logs) => {
+    if (err) { throw err }
+    logs = _.compact(_.flatten(logs))
+    t.deepEqual(logs, [STARTUP_MSG, CHANGE_MSG, 'FOO'])
+    killChild(child)
+    t.end()
+  })
+})
+
+test('ignore initial discovery of file', (t) => {
+  let dir = mkdir()
+  let fileA = `${ dir }/a.js`
+  fs.writeFileSync(fileA, 'console.log("FOO")')
+  let child = eldritchSpawn(`${fileA} --ignoreInitial true`)
+  series([
+    getStdout(child),
+    (cb) => fs.writeFile(fileA, 'console.log("BAR")', cb),
+    getStdout(child)
+  ], (err, logs) => {
+    if (err) { throw err }
+    logs = _.compact(_.flatten(logs))
+    t.deepEqual(logs, [STARTUP_MSG, CHANGE_MSG, 'BAR'])
+    killChild(child)
     t.end()
   })
 })

@@ -30,8 +30,8 @@ let remove = (filename) => {
   reloadFiles()
 }
 
-let init = (paths) => {
-  let watcher = chokidar.watch(paths)
+let init = (paths, opts) => {
+  let watcher = chokidar.watch(paths, opts)
   watcher
     .on('add', add)
     .on('change', add)

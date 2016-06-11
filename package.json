@@ -17,6 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "chokidar": "^1.5.1",
+    "lodash.omit": "^4.3.0",
     "yargs": "^4.7.1"
   },
   "devDependencies": {
