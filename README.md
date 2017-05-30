@@ -5,7 +5,7 @@ Watch js files and run them in a hidden Electron browser window when they change
 ## Installation
 
 ```
-npm install -g electron-prebuilt
+npm install -g electron
 npm install -g eldritch
 ```
 
